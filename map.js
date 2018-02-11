@@ -13,8 +13,6 @@ const myURL = reqgeo.url; // http://localhost/flowers.jpg
 const myMethod = reqgeo.method; // GET
 
 
-
-
 map.on('load', function () {
 
 
@@ -44,6 +42,7 @@ map.on('load', function () {
           }
       });
       
+      /*
       map.on('click', 'parks', function (e) {
         
       new mapboxgl.Popup()
@@ -51,7 +50,9 @@ map.on('load', function () {
           .setHTML(e.features[0].properties.UNIT_NAME)
           .addTo(map);
         
-  });
+        });
+        
+        */
   
   let comfortreq = new Request('./comfortdc.geojson');
   
@@ -97,34 +98,47 @@ map.on('load', function () {
      //console.log(marker.dc_comfort_stations_priority);
     // el.style = "width:20px;height:40px";
     
-         el.style =  el.style+ "font-size:35rem;width:30px;text-align:center;";
-
-     if(marker.properties.dc_comfort_stations_priority === '2. High' ) {
-       
-       el.className = 'high';
-
+    el.style =  el.style+ "font-size:35rem;width:30px;text-align:center;";
+    let dcint = parseInt(marker.properties.dc_comfort_stations_dm.split('$')[1].replace(',', ''));
     
+    
+    
+    console.log('intdc', marker.properties.dc_comfort_stations_dm.split('$'))
+    
+
+     if(marker.properties.dc_comfort_stations_dm == "$0" ) {
+      
+       el.className = 'nodm';
+
      }
-     else if(marker.properties.dc_comfort_stations_priority === '1. Highest') {
+     else if(dcint < 10000 ) {
+      
+       el.className = 'meddm';
+
+     }
+     else  {
        
        el.className = 'worst'
      }
      
-     el.addEventListener('click', function() {
-       window.alert('marker clicked');
-   });
+      let popupstr = '<h3> '+ marker.properties.Common_Nam + '</h3></br>' + "Deferred maintenance: " + marker.properties.dc_comfort_stations_dm + '</h3>'
+      
+      
+      
+      console.log('dcint ', dcint)
+
+      
+      let newpop= new mapboxgl.Popup()
+        .setHTML(popupstr);
 
    // add marker to map
    new mapboxgl.Marker(el)
        .setLngLat(marker.geometry.coordinates)
-       .addTo(map);
-    
-    
+       .addTo(map)
+       .setPopup(newpop)
+;    
   })
-
-
-      
-      
+    
       
   })
   .catch(error => {
